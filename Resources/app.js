@@ -888,9 +888,23 @@ tests.twitterFeed = function() {
         sections: [section],
         templates: { 'template': template },
         defaultItemTemplate: 'template',
-        backgroundColor: 'black',
+        backgroundColor: 'transparent',
         rowHeight: 80
     });
+    var v = Ti.UI.createView({backgroundColor:"red", height:60, top:0, width: 300, visible: true});
+    listView.add(v);
+
+    listView.addEventListener("scroll", function(e) {
+        Ti.API.info(JSON.stringify(e));
+        if (e.contentOffset.y < -5) {
+            v.show();
+            v.top = -60 - e.contentOffset.y
+        } else {
+            v.hide();
+        }
+    });
+    alert(1);
+    
     win.add(listView);
     navGroup.open(win, { animated: true });
 
@@ -899,7 +913,7 @@ tests.twitterFeed = function() {
     var page = 1;
     loader.onload = function() {
         var tweets = eval('('+this.responseText+')');
-        Ti.API.info(this.responseText);
+        //Ti.API.info(this.responseText);
         var items = [];
         for (var i = 0; i < tweets.length; ++i) {
             items.push({ username: { text: tweets[i].user.screen_name }, message: { text: tweets[i].text }, avatar: { image: tweets[i].user.profile_image_url } });
@@ -910,12 +924,13 @@ tests.twitterFeed = function() {
         }
         section.appendItems(items);
         ++page;
+        /*
         if (page < 40) {
             setTimeout(function(){
                 loader.open("GET", url+'&page='+page);
                 loader.send();                          
             }, 10);
-        }
+        }*/
     };
     loader.open("GET", url+'&page='+page);
     loader.send();
